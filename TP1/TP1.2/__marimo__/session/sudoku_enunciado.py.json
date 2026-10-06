@@ -1,7 +1,7 @@
 {
   "version": "1",
   "metadata": {
-    "marimo_version": "0.24.2",
+    "marimo_version": "0.25.1",
     "script_metadata_hash": "00441117d6719522e397cdcec4393ea1"
   },
   "cells": [
@@ -33,7 +33,7 @@
     },
     {
       "id": "vblA",
-      "code_hash": "f19bc52ab8623bf6f0c2f80fabab723e",
+      "code_hash": "d356532b2b13ebaec0ddf17374ddb834",
       "outputs": [
         {
           "type": "data",

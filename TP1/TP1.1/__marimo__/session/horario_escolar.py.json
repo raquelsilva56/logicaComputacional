@@ -1,14 +1,151 @@
 {
   "version": "1",
   "metadata": {
-    "marimo_version": "0.24.2",
+    "marimo_version": "0.25.1",
     "script_metadata_hash": "cdac4f193ea60f385129ed849f93ec6c"
   },
   "cells": [
     {
       "id": "setup",
-      "code_hash": null,
-      "outputs": [],
+      "code_hash": "9a9e99fba656817195ae01a98012d435",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "63f8568dcc58a1c881677f99e17e4180",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"dados-de-entrada\">Dados de entrada</h2>\n<span class=\"paragraph\">N\u00f3s carregamos os dados de entrada de cada ficheiro de uma pasta <code>dados_folder</code> com a fun\u00e7\u00e3o <code>read_csv</code> e retornamos um dicion\u00e1rio agregando-os (cumprindo R8).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "d631b40cab8c3bd7592cbefc4f37eab1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "bf4972f73a9f45f647d0b3e1728cbe6e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"geracao-de-horarios\">Gera\u00e7\u00e3o de hor\u00e1rios</h2>\n<h3 id=\"requisitos-obrigatorios\">Requisitos obrigat\u00f3rios</h3></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "72b0f3112d3669763c2b280e84249ce9",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qWkz",
+      "code_hash": "8db23f2d01c3c7727a0ba342f8945bcb",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"fluxo-e-analise\">Fluxo e an\u00e1lise</h2>\n<span class=\"paragraph\">Come\u00e7amos por gerar <code>h0</code> -- o hor\u00e1rio inicial calculado a partir do conjunto presente na pasta <code>dados/</code>.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PXeY",
+      "code_hash": "0302f193841e07f941894902dc22955b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PghI",
+      "code_hash": "147a4154ea64f54537d8cd504b04cad5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Geramos agora, a partir de <code>dados_v2/</code>, <code>h1</code> e <code>h1_incremental</code>, correspondendo respetivamente a um hor\u00e1rio gerado do zero, e um hor\u00e1rio que utiliza o hor\u00e1rio <code>h0</code> como base.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "LzUj",
+      "code_hash": "bad4bd954ddb1fae58d693aedf172eb5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "HOcT",
+      "code_hash": "6c610bae471b05f8f5b67cc7d14d091d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Por fim, calculamos altera\u00e7\u00f5es entre os hor\u00e1rios e elaboramos uma an\u00e1lise comparativa entre estes utilizando como m\u00e9trica o tempo de execu\u00e7\u00e3o total, e as altera\u00e7\u00f5es totais entre as aulas.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "WpjJ",
+      "code_hash": "f4d934e1388235c9592f714e18349563",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"analise-da-construcao-incremental\">An\u00e1lise da constru\u00e7\u00e3o incremental</h3>\n<table>\n<thead>\n<tr>\n<th style=\"text-align: left;\">Hor\u00e1rio</th>\n<th style=\"text-align: left;\">Tempo</th>\n<th style=\"text-align: left;\">Aulas alteradas (vs H0)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align: left;\"><strong>H0</strong></td>\n<td style=\"text-align: left;\"><code>0.046456098556518555</code></td>\n<td style=\"text-align: left;\">N/A</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\"><strong>H1 (do zero)</strong></td>\n<td style=\"text-align: left;\"><code>0.039850711822509766</code></td>\n<td style=\"text-align: left;\"><code>31</code> aulas alteradas</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\"><strong>H1 (incremental)</strong></td>\n<td style=\"text-align: left;\"><code>0.039699554443359375</code></td>\n<td style=\"text-align: left;\"><code>0</code> aulas alteradas</td>\n</tr>\n<tr>\n<td style=\"text-align: left;\">---</td>\n<td style=\"text-align: left;\"></td>\n<td style=\"text-align: left;\"></td>\n</tr>\n</tbody>\n</table>\n<span class=\"paragraph\">Temos uma diferen\u00e7a de tempo entre H1 (do zero) e H1 (incremental) de <code>0.00015115737915039062</code>s.</span>\n<h3 id=\"visualizacao-interativa-de-horarios\">Visualiza\u00e7\u00e3o interativa de hor\u00e1rios</h3>\n<span class=\"paragraph\"><marimo-ui-element object-id='WpjJ-9' random-id='a4db7076-3730-48bc-4f74-ea92bb9787cb'><marimo-tabs data-initial-value='&quot;&quot;' data-label='null' data-tabs='[&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eH0 (original)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;,&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eH1 (do zero)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;,&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eH1 (incremental)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;]' data-orientation='&quot;horizontal&quot;'><div data-kind='tab'><marimo-ui-element object-id='WpjJ-2' random-id='56ee8d20-8cd8-3e10-3013-3d6d66512722'><marimo-tabs data-initial-value='&quot;&quot;' data-label='null' data-tabs='[&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eTurma 7\u00baA&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;,&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eTurma 7\u00baB&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;]' data-orientation='&quot;horizontal&quot;'><div data-kind='tab'><marimo-ui-element object-id='WpjJ-0' random-id='ef180de2-7499-3576-8e67-7794aaaa413e'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Periodo&#92;&quot;:1,&#92;&quot;Seg&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;-&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:2,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:3,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:4,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:5,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;-&#92;&quot;}]&quot;' data-total-rows='5' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Seg&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Ter&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qua&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qui&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Sex&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;Periodo&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div><div data-kind='tab'><marimo-ui-element object-id='WpjJ-1' random-id='8288f377-5d79-08d0-a56c-c8c1dd84a325'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Periodo&#92;&quot;:1,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;-&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:2,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;-&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:3,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:4,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:5,&#92;&quot;Seg&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;}]&quot;' data-total-rows='5' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Seg&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Ter&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qua&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qui&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Sex&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;Periodo&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div></marimo-tabs></marimo-ui-element></div><div data-kind='tab'><marimo-ui-element object-id='WpjJ-5' random-id='e23f23eb-a6e4-4582-188e-43e0f884137f'><marimo-tabs data-initial-value='&quot;&quot;' data-label='null' data-tabs='[&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eTurma 7\u00baA&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;,&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eTurma 7\u00baB&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;]' data-orientation='&quot;horizontal&quot;'><div data-kind='tab'><marimo-ui-element object-id='WpjJ-3' random-id='d391b83d-9eae-ba13-935c-cf7692015415'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Periodo&#92;&quot;:1,&#92;&quot;Seg&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:2,&#92;&quot;Seg&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;-&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:3,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;-&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:4,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:5,&#92;&quot;Seg&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;}]&quot;' data-total-rows='5' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Seg&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Ter&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qua&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qui&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Sex&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;Periodo&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div><div data-kind='tab'><marimo-ui-element object-id='WpjJ-4' random-id='d1ac1043-0fa5-ea7f-896c-41be285f0de1'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Periodo&#92;&quot;:1,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:2,&#92;&quot;Seg&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:3,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:4,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:5,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;}]&quot;' data-total-rows='5' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Seg&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Ter&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qua&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qui&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Sex&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;Periodo&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div></marimo-tabs></marimo-ui-element></div><div data-kind='tab'><marimo-ui-element object-id='WpjJ-8' random-id='2da4ff36-c5ae-76eb-1c5e-33da1b2299ac'><marimo-tabs data-initial-value='&quot;&quot;' data-label='null' data-tabs='[&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eTurma 7\u00baA&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;,&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eTurma 7\u00baB&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;]' data-orientation='&quot;horizontal&quot;'><div data-kind='tab'><marimo-ui-element object-id='WpjJ-6' random-id='d6b02dc5-274f-cd9d-045d-e3ce462daee7'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Periodo&#92;&quot;:1,&#92;&quot;Seg&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;-&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:2,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:3,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:4,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:5,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;-&#92;&quot;}]&quot;' data-total-rows='5' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Seg&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Ter&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qua&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qui&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Sex&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;Periodo&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div><div data-kind='tab'><marimo-ui-element object-id='WpjJ-7' random-id='172cb6c9-6f79-46f4-4844-4b986276be1d'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Periodo&#92;&quot;:1,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;-&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:2,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;-&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:3,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Matem&#92;&#92;u00e1tica&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:4,&#92;&quot;Seg&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Ci&#92;&#92;u00eancias&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Portugu&#92;&#92;u00eas&#92;&quot;},{&#92;&quot;Periodo&#92;&quot;:5,&#92;&quot;Seg&#92;&quot;:&#92;&quot;-&#92;&quot;,&#92;&quot;Ter&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;,&#92;&quot;Qua&#92;&quot;:&#92;&quot;Educa&#92;&#92;u00e7&#92;&#92;u00e3o F&#92;&#92;u00edsica&#92;&quot;,&#92;&quot;Qui&#92;&quot;:&#92;&quot;Ingl&#92;&#92;u00eas&#92;&quot;,&#92;&quot;Sex&#92;&quot;:&#92;&quot;Hist&#92;&#92;u00f3ria&#92;&quot;}]&quot;' data-total-rows='5' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Seg&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Ter&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qua&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Qui&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;Sex&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;Periodo&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div></marimo-tabs></marimo-ui-element></div></marimo-tabs></marimo-ui-element></span></span>"
+          }
+        }
+      ],
       "console": []
     }
   ]
