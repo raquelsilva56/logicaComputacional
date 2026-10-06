@@ -54,7 +54,39 @@ def _():
 def _():
     mo.md(r"""
     ## Geração de horários
-    ### Requisitos obrigatórios
+    ### 1. Variáveis de Decisão
+    A base para o modelo é uma sequência tridimensional de uma variável $x$. Para cada turma ($t$), disciplina ($d$), dia da semana ($dia$) e período ($p$), temos que:
+
+    \[
+      x_{t, d, dia, p} \in \{0, 1\}
+    \]
+
+    Se $x == 1$, a aula ocorre naquele exato espaço e tempo.
+
+    Para facilitar o acesso à disciplina de cada professor, utilizamos um dicionário `prof_disc` que mapeia cada docente à sua lista de disciplinas.
+
+    ### 2. Requisitos obrigatórios (R1-R8)
+    Impomos as restrições obrigatórias iterando nas dimensões relevantes da variável $x$:
+    * R1: usamos `add_at_most_one` iterando sobre todas as disciplinas para garantir que uma turma nunca tem mais do que uma aula no mesmo período;
+    * R2: a soma de todas as variáveis $x$ de uma disciplina numa dada turma ao longo da semana é forçada a ser estritamente igual ao valor `carga_semanal`.
+    * R3 e R4 (Aulas diárias e blocos duplos):
+        para disciplinas de período simples (`duplo_periodo = nao`), aplicamos `add_at_most_one` por dia, forçando as aulas a espalharem-se pela semana.
+        para disciplinas duplas (`duplo_periodo = sim`), construímos os possíveis arranjos da mesma disciplina e fornecemo-nas ao solver através de `add_allowed_assignment`.
+    * R5 (Conflitos de professor): mapeamos quais disciplinas pertencem a cada professor e garantimos, via `add_at_most_one`, que o docente só leciona uma turma/disciplina por período.
+    * R6 (Exceções): consultamos o ficheiro de exceções e forçamos que a variável `x` seja igual a 0 nos períodos em que os professores não podem dar aulas.
+    * R7 (Capacidade das salas): para cada período, agrupamos as disciplinas relacionadas pelos seus requisitos de sala e forçamos que a soma dessas seja menor ou igual à `quantidade` global de salas desse tipo.
+    * R8 (Dados de entrada): ver célula anterior.
+
+    ### 3. Função objetivo (O1)
+    Para evitar "buracos" no horário de cada professor, simulamos sua atividade num determinado período do dia através de uma variável `u` e detectamos possíveis buracos com infímos e supremos (conjunção e disjunção), minimizando (ponto 3 da próxima secção) interrupções nos horários de cada um dos professores.
+
+    ### 4. Construção incremental (R9)
+    Para cenários onde alguns dos recuross mudam ligeiramente recalcular um modelo do zero pode alterar os horários de outras turmas/professores desnecessariamente.
+
+    Para evitar isso, podemos tirar vantagem de um horário previamente calculado que é passado como parâmetro (opcional) à função e utilizá-lo para:
+    1. Dar dicas ao solver (`add_hint`), permitindo que a solução tenha um ponto de partida "próximo" no espaço de pesquisa;
+    2. Registramos possíveis diferenças (`diffs`) em variáveis;
+    3. Minimizamos essas diferenças e buracos no horário individual de cada professor utilizando `minimize`, fazendo com que o solver evite a deslocação de aulas ao máximo possível.
     """)
     return
 
@@ -309,7 +341,7 @@ def _(h0, h1, h1_incremental, time_h0, time_h1, time_h1_incremental):
     aulas_h1_incremental = {k for k, v in h1_incremental.items() if v == 1}
 
     # alterações de h1 (gerado do zero) em comparação a h0
-    # dividimos por 2 pois cada diferença gera duas discrepâncias
+    # dividimos por 2 pois cada discrepância gera duas diferenças
     alteracoes = len(aulas_h0.symmetric_difference(aulas_h1)) // 2
 
     # alterações de h1 (gerado incrementalmente) em comparação a h0
@@ -368,9 +400,8 @@ def _(h0, h1, h1_incremental, time_h0, time_h1, time_h1_incremental):
     | **H0** | `{time_h0}` | N/A |
     | **H1 (do zero)** | `{time_h1}` | `{alteracoes}` aulas alteradas |
     | **H1 (incremental)** | `{time_h1_incremental}` | `{alteracoes_incremental}` aulas alteradas |
-    ---
 
-    Temos uma diferença de tempo entre H1 (do zero) e H1 (incremental) de `{time_h1 - time_h1_incremental}`s.
+    Temos uma diferença de tempo entre H1 (do zero) e H1 (incremental) de `{time_h1 - time_h1_incremental}` segundos.
 
     ### Visualização interativa de horários
 
