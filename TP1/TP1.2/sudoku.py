@@ -534,8 +534,6 @@ def _(mo):
 
     **Valor por omissão.** $k = n$, da ordem de $n$ como o enunciado sugere.
 
-    **Puzzle sem solução.** [Escreve aqui a tua decisão: tentar novas pistas ou
-    reportar o insucesso, e porquê.]
     """)
     return
 
