@@ -186,3 +186,19 @@ def K_c(k):
 
 K_c(1)
 K_c(2)
+
+#alinea d) "o programa termina, quaisquer que sejam a e b", provar no SFOTS 
+
+def caminho(K):
+    st=[declare(i) for i in range(K + 1)] 
+    sol=Solver()
+    sol.add(init(st[0]))#qq a e b 
+    for i in range(K): 
+        sol.add(trans(st[i], st[i+1]))
+    return sol.check()
+
+print("caminho de 4n transicoes:",caminho(4*n)) #sat ainda nao chegou ao stop
+print("caminho de 4n+1 transicoes:",caminho(4*n+1)) #unsat,ja chegou ao stop
+
+
+#falta por os testes em unittest 
