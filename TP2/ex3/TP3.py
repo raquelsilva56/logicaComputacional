@@ -111,7 +111,21 @@ teste1()
 def P(s):
     return s['x']*s['y'] + s['z'] == s['a']*s['b'] #formula a provar
 
+"""def base():
+    s0= declare(0)
+    sol=Solver()
+    sol.add(init(s0), Not(P(s0))) #procura contraexemplo, por isso o uso de NOT
+    print("base:",sol.check()) #tem de imprimir unsat
 
+def inducao():
+    s0= declare(0)
+    s1= declare(1)
+    sol=Solver()
+    sol.add(P(s0), trans(s0,s1), Not(P(s1)))#P agora, e o proximo falha?
+    r=sol.check()
+    print("inducao:",r) #unsat tambem 
+    if r==sat:
+        print(sol.model()) #mostra o contra-exemplo"""
 
 
 
