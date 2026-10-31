@@ -1,4 +1,4 @@
-from z3 import BitVec, And, Or, ULT, UGE, LShR, Solver, sat, unsat, Not
+from z3 import BitVec, And, Or, ULT, UGE, LShR, Solver, sat, unsat, Not, ZeroExt
 #tenho de usar ULT por causa do aviso do PDF sem sinal. 
 #overflow no left skip do pdf
 
@@ -153,3 +153,36 @@ def K(k):
 
 K(1)
 K(2)
+
+
+#alinea c) Segurança, mostrar que, com a < 2^(n/2) e b < 2^(n/2), o estado de erro (pc == 4) nunca é acessível.
+
+def init_c(s):
+    return And(init(s), ULT(s['a'], 2**(n//2)), ULT(s['b'], 2**(n//2)))
+
+def W(v): #aumenta v em n para 2n bits
+    return ZeroExt(n, v)
+
+def Q(s):
+    return And(Not(erro(s)),                                   #n esta no estado de erro
+               ULT(s['a'], 2**(n//2)), ULT(s['b'], 2**(n//2)), # a e b pequenos
+               W(s['x'])*W(s['y']) + W(s['z']) == W(s['a'])*W(s['b']))  #fomula a provar
+
+def K_c(k):
+    st = [declare(i) for i in range(k + 1)]
+
+    sol = Solver()       #base
+    sol.add(init_c(st[0]))
+    for i in range(k - 1):
+        sol.add(trans(st[i], st[i + 1]))
+    sol.add(Or([Not(Q(st[i])) for i in range(k)]))
+    print("baseK:", sol.check())   #unsat
+
+    sol = Solver()   #inducao
+    for i in range(k):
+        sol.add(Q(st[i]), trans(st[i], st[i + 1]))
+    sol.add(Not(Q(st[k])))
+    print("induçãoK:", sol.check())       #k=1:sat e k=2:unsat
+
+K_c(1)
+K_c(2)
