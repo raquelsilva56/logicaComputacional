@@ -1,4 +1,4 @@
-from z3 import * 
+from z3 import BitVec, And, Or, ULT, UGE, LShR, Solver, sat, unsat, Not
 #tenho de usar ULT por causa do aviso do PDF sem sinal. 
 #overflow no left skip do pdf
 
@@ -45,7 +45,7 @@ def left_skip(s,t):
             ULT(s['x'], 2**(n-1)), #sem overflow no shift
             t['pc'] ==1 ,
             t['x'] == s['x'] << 1,
-            t['y'] == LShr(s['y'],1), #div por 2 sem sinal
+            t['y'] == LShR(s['y'],1), #div por 2 sem sinal
             keep(s,t,['a', 'b' , 'z']))
 
 #left- error(overflow), implementa a parte do pdf onde o erro tem precedencia: se ha overflow, so o ramo de erro e possivel
@@ -74,3 +74,68 @@ def right_error(s, t):
 #estado do erro tem de estar no nodo error
 def erro(s):
     return s['pc'] == 4
+
+def init_skip(s,t):
+    return And(s['pc'] == 0, t['pc'] == 1,
+            keep(s, t, ['a','b','x','y','z']))
+
+#mesma coisa do skipleft mas com a condicao de y impar, vai para o nodo 3
+def skip_right(s,t):
+    return And(s['pc'] == 1, s['y'] != 0, (s['y'] & 1) == 1,
+            t['pc'] == 3,
+            keep(s, t, ['a','b','x','y','z']))
+
+#tem 8 ramos, um por cada transicao possivel, retorna a disjuncao de todos os ramos possiveis
+def trans(s,t):
+    return Or(init_skip(s,t), skip_left(s,t), skip_stop(s,t), left_skip(s,t), left_error(s,t), skip_right(s,t), right_skip(s,t), right_error(s,t))
+
+#teste p ver se o automato multiplica mm. Pedi ao z3 um percurso q comece com a=3, b=2, e acabe em stop com z==6
+def teste1():
+    K=6 #numero de passos
+    st= [declare(i) for i in range(K+1)]
+    sol=Solver()
+    sol.add(init(st[0]),st[0]['a']==3, st[0]['b']==2)
+    for i in range(K):
+        sol.add(trans(st[i], st[i+1]))
+    sol.add(Or([And(s['pc']==5, s['z']==6)for s in st]))
+    print(sol.check()) #tem de imprimir sat, tem 6 passos (init → skip → left → skip → right → skip → stop)
+
+teste1()
+
+
+#parte b) k-inducao, provar que P(s) := x*y + z == a*b vale em todos os estados alcancaveis.
+# nao da para percorrer tudo(infinitos) logo a inducao usa duas verificacoes: Para k=1:
+#Base: estado inicial cumpre P. Inducao: se um estado cumpre P e vai para outro, esse tbm cumpre P.
+#Em ambas, decidi pedir um contra-exemplo ao z3, unsat se nao houver, logo esta provado. 
+
+def P(s):
+    return s['x']*s['y'] + s['z'] == s['a']*s['b'] #formula a provar
+
+
+
+
+
+#com k=1 nao deu certo, pois nao pode acontecer y impar e estar no left, logo temos de subir k 
+#para k=2
+#pedir ao claude para juntar  
+
+def K(k):
+    st = [declare(i) for i in range(k + 1)]
+
+    #base: P no estado inicial
+    sol = Solver()
+    sol.add(init(st[0]))
+    for i in range(k - 1):
+        sol.add(trans(st[i], st[i + 1]))
+    sol.add(Or([Not(P(st[i])) for i in range(k)]))
+    print("base:", sol.check()) #unsat
+
+    #inducao: P em k estados seguidos
+    sol = Solver()
+    for i in range(k):
+        sol.add(P(st[i]), trans(st[i], st[i + 1]))
+    sol.add(Not(P(st[k])))
+    print("inducaoK:", sol.check())  #unsat 
+
+K(1)
+K(2)
