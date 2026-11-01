@@ -1,7 +1,7 @@
 from z3 import BitVec, And, Or, ULT, UGE, LShR, Solver, sat, unsat, Not, ZeroExt
 #tenho de usar ULT por causa do aviso do PDF sem sinal. 
 #overflow no left skip do pdf
-
+import unittest
 
 n = 8 #tamanho dos bitvecs. Parametro
 
@@ -89,19 +89,6 @@ def skip_right(s,t):
 def trans(s,t):
     return Or(init_skip(s,t), skip_left(s,t), skip_stop(s,t), left_skip(s,t), left_error(s,t), skip_right(s,t), right_skip(s,t), right_error(s,t))
 
-#teste p ver se o automato multiplica mm. Pedi ao z3 um percurso q comece com a=3, b=2, e acabe em stop com z==6
-def teste1():
-    K=6 #numero de passos
-    st= [declare(i) for i in range(K+1)]
-    sol=Solver()
-    sol.add(init(st[0]),st[0]['a']==3, st[0]['b']==2)
-    for i in range(K):
-        sol.add(trans(st[i], st[i+1]))
-    sol.add(Or([And(s['pc']==5, s['z']==6)for s in st]))
-    print(sol.check()) #tem de imprimir sat, tem 6 passos (init → skip → left → skip → right → skip → stop)
-
-teste1()
-
 
 #parte b) k-inducao, provar que P(s) := x*y + z == a*b vale em todos os estados alcancaveis.
 # nao da para percorrer tudo(infinitos) logo a inducao usa duas verificacoes: Para k=1:
@@ -111,48 +98,6 @@ teste1()
 def P(s):
     return s['x']*s['y'] + s['z'] == s['a']*s['b'] #formula a provar
 
-"""def base():
-    s0= declare(0)
-    sol=Solver()
-    sol.add(init(s0), Not(P(s0))) #procura contraexemplo, por isso o uso de NOT
-    print("base:",sol.check()) #tem de imprimir unsat
-
-def inducao():
-    s0= declare(0)
-    s1= declare(1)
-    sol=Solver()
-    sol.add(P(s0), trans(s0,s1), Not(P(s1)))#P agora, e o proximo falha?
-    r=sol.check()
-    print("inducao:",r) #unsat tambem 
-    if r==sat:
-        print(sol.model()) #mostra o contra-exemplo"""
-
-
-
-#com k=1 nao deu certo, pois nao pode acontecer y impar e estar no left, logo temos de subir k 
-#para k=2
-#pedir ao claude para juntar  
-
-def K(k):
-    st = [declare(i) for i in range(k + 1)]
-
-    #base: P no estado inicial
-    sol = Solver()
-    sol.add(init(st[0]))
-    for i in range(k - 1):
-        sol.add(trans(st[i], st[i + 1]))
-    sol.add(Or([Not(P(st[i])) for i in range(k)]))
-    print("base:", sol.check()) #unsat
-
-    #inducao: P em k estados seguidos
-    sol = Solver()
-    for i in range(k):
-        sol.add(P(st[i]), trans(st[i], st[i + 1]))
-    sol.add(Not(P(st[k])))
-    print("inducaoK:", sol.check())  #unsat 
-
-K(1)
-K(2)
 
 
 #alinea c) Segurança, mostrar que, com a < 2^(n/2) e b < 2^(n/2), o estado de erro (pc == 4) nunca é acessível.
@@ -168,37 +113,91 @@ def Q(s):
                ULT(s['a'], 2**(n//2)), ULT(s['b'], 2**(n//2)), # a e b pequenos
                W(s['x'])*W(s['y']) + W(s['z']) == W(s['a'])*W(s['b']))  #fomula a provar
 
-def K_c(k):
-    st = [declare(i) for i in range(k + 1)]
-
-    sol = Solver()       #base
-    sol.add(init_c(st[0]))
-    for i in range(k - 1):
-        sol.add(trans(st[i], st[i + 1]))
-    sol.add(Or([Not(Q(st[i])) for i in range(k)]))
-    print("baseK:", sol.check())   #unsat
-
-    sol = Solver()   #inducao
-    for i in range(k):
-        sol.add(Q(st[i]), trans(st[i], st[i + 1]))
-    sol.add(Not(Q(st[k])))
-    print("induçãoK:", sol.check())       #k=1:sat e k=2:unsat
-
-K_c(1)
-K_c(2)
 
 #alinea d) "o programa termina, quaisquer que sejam a e b", provar no SFOTS 
 
-def caminho(K):
-    st=[declare(i) for i in range(K + 1)] 
+def verifica(k,inicio,prop):
+    "devolve (base, inducao):(unsat, unsat) prova a propiedade por k-inducao"
+    st=[declare(i) for i in range(k+1)] #estados sk 
+    sol=Solver() #base 
+    sol.add(inicio(st[0])) #estado inicial
+    for i in range(k-1):
+        sol.add(trans(st[i],st[i+1])) 
+    sol.add(Or([Not(prop(st[i])) for i in range(k)])) #procurar contra-exemplo
+    base=sol.check() #base 
+
+    sol=Solver() #inducao 
+    for i in range(k):
+        sol.add(prop(st[i]),trans(st[i],st[i+1]))
+    sol.add(Not(prop(st[k]))) #procurar contra-exemplo
+    return base, sol.check() #base, inducao 
+
+
+def caminho(K, inicio, final=None):
+    "existe caminho com k transicoes a partir de 'inicio'?"
+    st=[declare(i) for i in range(K+1)]
     sol=Solver()
-    sol.add(init(st[0]))#qq a e b 
-    for i in range(K): 
-        sol.add(trans(st[i], st[i+1]))
+    sol.add(inicio(st[0]))
+    for i in range(K):
+        sol.add(trans(st[i],st[i+1]))
+    if final:
+        sol.add(final(st[K]))
+    return sol.check() 
+
+def terminal(s): 
+    return Or(s['pc'] == 4, s['pc'] == 5) #estado de erro ou stop
+
+def inducao(s,t): 
+    return Or(trans(s,t), And(terminal(s), t['pc']==s['pc'], keep(s,t,['a','b','x','y','z'])))
+
+def termina_em(K,inicio,alvo): 
+    "unsat--- em k passos chego sempre ao alvo"
+    st=[declare(i) for i in range(K+1)]
+    sol=Solver()
+    sol.add(inicio(st[0]))
+    for i in range(K):
+        sol.add(inducao(st[i],st[i+1]))
+    sol.add(Not(alvo(st[K])))
     return sol.check()
 
-print("caminho de 4n transicoes:",caminho(4*n)) #sat ainda nao chegou ao stop
-print("caminho de 4n+1 transicoes:",caminho(4*n+1)) #unsat,ja chegou ao stop
+
+class TestModelo(unittest.TestCase): #testa a) 
+    def test_3_vezes_2(self):
+        ini=lambda s: And(init(s), s['a']==3, s['b']==2)
+        self.assertEqual(caminho(6,ini,lambda s: And(s['pc']==5, s['z']==6)), sat) #3*2=6
+
+    def test_3_vezes_2_resultado_errado(self):
+        ini = lambda s: And(init(s), s['a'] == 3, s['b'] == 2)
+        self.assertEqual(caminho(6, ini, lambda s: And(s['pc'] == 5, s['z'] != 6)), unsat)
+
+    def test_overflow(self):
+        ini = lambda s: And(init(s), s['a'] == 200, s['b'] == 2)
+        self.assertEqual(caminho(3, ini, erro), sat)
+
+class TestInvariante(unittest.TestCase): #testa b) 
+    def test_k1_nao_basta(self):
+        self.assertEqual(verifica(1, init, P), (unsat, sat))
+    def test_k2_prova(self):
+        self.assertEqual(verifica(2, init, P), (unsat, unsat))
+
+    
 
 
-#falta por os testes em unittest 
+class TestSeguranca(unittest.TestCase): #testa c)
+    def test_k1_nao_basta(self):
+        self.assertEqual(verifica(1, init_c, Q)[1], sat)
+
+    def test_k2_prova(self):
+        self.assertEqual(verifica(2, init_c, Q), (unsat, unsat))
+
+
+class testTermina(unittest.TestCase): #testa d)
+    def test_pior_caso_existe(self):
+        self.assertEqual(caminho(4 * n, init), sat)
+
+    def test_nao_ha_caminho_maior(self):
+        self.assertEqual(caminho(4 * n + 1, init), unsat)
+
+
+if __name__ == "__main__":
+    unittest.main(argv=['x'], verbosity=2)
