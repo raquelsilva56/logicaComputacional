@@ -8,8 +8,9 @@ app = marimo.App(width="medium")
 def _():
     import marimo as mo
     import random
+    import z3
 
-    return (mo,)
+    return mo, random, z3
 
 
 @app.cell(hide_code=True)
@@ -38,6 +39,82 @@ def _(mo):
       1. Nunca se alcança o estado de erro
       2. Nenhuma célula normal está permanentemente morta ou permanentemente viva.
     """)
+    return
+
+
+@app.cell
+def _(mo):
+    N = 20
+    transicao_multipla = mo.ui.switch(label="Transição múltipla")
+    return N, transicao_multipla
+
+
+@app.cell
+def _(mo, transicao_multipla):
+    mo.hstack([transicao_multipla, mo.md(f" = {transicao_multipla.value}")])
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Representação da máquina de estados em Z3
+    ### Declaração do estado
+    Começamos por criar um a grelha inicial $(N + 2)^2$, com as fronteiras constantes. As células inicias são geradas aleatoriamente com base em `seed`. As células finais são obrigatoriamente mortas.
+    """)
+    return
+
+
+@app.cell
+def _(N, random, z3):
+    def criar_estado(t, seed = 2112026):
+        rng = random.Random(seed)
+        e = {}
+        for r in range(N + 2):
+            for c in range(N + 2):
+                if r == 0 or c == 0:
+                    # 2N + 1 celulas iniciais com probabilidade 1/2 de estarem vivas ou mortas
+                    viva = rng.choice([True, False])
+                    e[(r, c)] = z3.BoolVal(viva)
+                
+                elif r == N + 1 or c == N + 1:
+                    # 2N + 3 celulas finais sempre mortas
+                    e[(r, c)] = z3.BoolVal(False)
+                
+                else:
+                    # N * N células normais variadas no período t
+                    e[(r, c)] = z3.Bool(f"c_{t}_{r}_{c}")
+
+        return e
+
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### Estado inicial e estado de erro
+    Conforme especificado no enunciado, o estado inicial $e_0$ contém todas as células normais mortas, com exceção daquelas com ambos os índices $\leq 3$. O estado de erro é definido como o estado em que todas as célulsa normais estão.
+    """)
+    return
+
+
+@app.cell
+def _(N, z3):
+    def estado_inicial(e):
+        return z3.And([
+            e[(r, c)] == (r <= 3 and c <= 3)
+            for r in range(1, N + 1)
+            for c in range(1, N + 1)
+        ])
+
+    def estado_erro(e):
+        return z3.And([
+            z3.Not(e[(r, c)])
+            for r in range(1, N + 1)
+            for c in range(1, N + 1)
+        ])
+
     return
 
 
