@@ -1,4 +1,4 @@
-from z3 import BitVec, And, Or, ULT, UGE, LShR, Solver, sat, unsat, Not, ZeroExt
+from z3 import BitVec, BitVecVal, And, Or, Not, If, Implies, ForAll, ULT, UGE, LShR, ZeroExt, Solver, sat, unsat
 #tenho de usar ULT por causa do aviso do PDF sem sinal. 
 #overflow no left skip do pdf
 import unittest
@@ -86,8 +86,49 @@ def skip_right(s,t):
             keep(s, t, ['a','b','x','y','z']))
 
 #tem 8 ramos, um por cada transicao possivel, retorna a disjuncao de todos os ramos possiveis
-def trans(s,t):
+def ramos(s,t):
     return Or(init_skip(s,t), skip_left(s,t), skip_stop(s,t), left_skip(s,t), left_error(s,t), skip_right(s,t), right_skip(s,t), right_error(s,t))
+
+def terminal(s): 
+    return Or(s['pc'] == 4, s['pc'] == 5) #estado de erro ou stop
+
+def laco(s,t):
+    return And(terminal(s), keep(s,t,['pc','a','b','x','y','z']))
+def trans(s,t):
+    return Or(ramos(s,t),laco(s,t))
+
+
+def induction_always(declare, init,trans,inv):
+    #da ficha8
+    s,t=declare(0), declare(1)
+    sol=Solver()
+    sol.add(init(s),Not(inv(s)))
+    if sol.check() == sat: 
+        return "Base falha"
+    sol= Solver()
+    sol.add(inv(s), trans(s,t),Not(inv(t)))
+    if sol.check() == sat:
+        return "Passo Indutivo falha"
+    return "invariante"
+
+
+
+def Kinduction_always(declare, init,trans, inv,k):
+    st=[declare(i) for i in range(k+1)]
+    sol=Solver()
+    sol.add(init(st[0]))
+    for i in range (k-1):
+        sol.add(trans(st[i],st[i+1]))
+    sol.add(Or([Not(inv(st[i]))for i in range(k)]))
+    if sol.check()== sat:
+        return "Base falha"
+    sol=Solver()
+    for i in range(k):
+        sol.add(inv(st[i]), trans(st[i],st[i+1]))
+    sol.add(Not(inv(st[k])))
+    if sol.check() == sat:
+        return "Passo Indutivo falha"
+    return "invariante"
 
 
 #parte b) k-inducao, provar que P(s) := x*y + z == a*b vale em todos os estados alcancaveis.
@@ -114,27 +155,10 @@ def Q(s):
                W(s['x'])*W(s['y']) + W(s['z']) == W(s['a'])*W(s['b']))  #fomula a provar
 
 
-#alinea d) "o programa termina, quaisquer que sejam a e b", provar no SFOTS 
-
-def verifica(k,inicio,prop):
-    "devolve (base, inducao):(unsat, unsat) prova a propiedade por k-inducao"
-    st=[declare(i) for i in range(k+1)] #estados sk 
-    sol=Solver() #base 
-    sol.add(inicio(st[0])) #estado inicial
-    for i in range(k-1):
-        sol.add(trans(st[i],st[i+1])) 
-    sol.add(Or([Not(prop(st[i])) for i in range(k)])) #procurar contra-exemplo
-    base=sol.check() #base 
-
-    sol=Solver() #inducao 
-    for i in range(k):
-        sol.add(prop(st[i]),trans(st[i],st[i+1]))
-    sol.add(Not(prop(st[k]))) #procurar contra-exemplo
-    return base, sol.check() #base, inducao 
-
+#alinea d) variante. "o programa termina, quaisquer que sejam a e b", provar no SFOTS 
 
 def caminho(K, inicio, final=None):
-    "existe caminho com k transicoes a partir de 'inicio'?"
+    #existe caminho com k transicoes a partir de 'inicio'?
     st=[declare(i) for i in range(K+1)]
     sol=Solver()
     sol.add(inicio(st[0]))
@@ -144,21 +168,31 @@ def caminho(K, inicio, final=None):
         sol.add(final(st[K]))
     return sol.check() 
 
-def terminal(s): 
-    return Or(s['pc'] == 4, s['pc'] == 5) #estado de erro ou stop
+#propriedade de terminação(animação): F(G terminal)
+#a partir de qualquer estado inicial (a,b,quaisquer), o sistema chega a um estado final
+#(pc=4 ou =5) e assim fica(o laço garante a permanencia).
+#Segui o método da ficha 8 onde a variante V tem 3 condições
+#1) V>=0(auto: BitVecs s/sinal)
+#2) V decresce estritam/ ou chega a 0 -> decresce_forall
+#3) V=0 -> terminal -> v_zero
 
-def inducao(s,t): 
-    return Or(trans(s,t), And(terminal(s), t['pc']==s['pc'], keep(s,t,['a','b','x','y','z'])))
 
-def termina_em(K,inicio,alvo): 
-    "unsat--- em k passos chego sempre ao alvo"
-    st=[declare(i) for i in range(K+1)]
-    sol=Solver()
-    sol.add(inicio(st[0]))
-    for i in range(K):
-        sol.add(inducao(st[i],st[i+1]))
-    sol.add(Not(alvo(st[K])))
-    return sol.check()
+def V(s): #variante em 2n bits
+    y=W(s['y'])
+    w=If(s['pc']==0, BitVecVal(3,2*n),
+         If(s['pc']==1, BitVecVal(2,2*n), BitVecVal(1,2*n)))
+    return If(terminal(s), BitVecVal(0,2*n), 4*y+w)
+
+def decresce(s,t): #V' <V ou V'=0 
+    return Or(ULT(V(t),V(s)),V(t)==0)
+
+def decresce_forall(s): #condiçao 2 da ficha com o "para todo"
+    t=declare('p')
+    return ForAll([t[v] for v in t], Implies(trans(s,t), decresce(s,t)))
+
+def v_zero(s):
+    return Implies(V(s)==0,terminal(s))
+
 
 
 class TestModelo(unittest.TestCase): #testa a) 
@@ -174,34 +208,36 @@ class TestModelo(unittest.TestCase): #testa a)
         ini = lambda s: And(init(s), s['a'] == 200, s['b'] == 2)
         self.assertEqual(caminho(3, ini, erro), sat)
 
+
 class TestInvariante(unittest.TestCase): #testa b) 
     def test_k1_nao_basta(self):
-        self.assertEqual(verifica(1, init, P), (unsat, sat))
+        self.assertEqual(induction_always(declare, init,trans,P),"Passo Indutivo falha")
+
     def test_k2_prova(self):
-        self.assertEqual(verifica(2, init, P), (unsat, unsat))
+        self.assertEqual(Kinduction_always(declare,init,trans,P,2),"invariante")
 
     
 
 
 class TestSeguranca(unittest.TestCase): #testa c)
     def test_k1_nao_basta(self):
-        self.assertEqual(verifica(1, init_c, Q)[1], sat)
+        self.assertEqual(Kinduction_always(declare,init_c,trans,Q,1),"Passo Indutivo falha")
 
     def test_k2_prova(self):
-        self.assertEqual(verifica(2, init_c, Q), (unsat, unsat))
+        self.assertEqual(Kinduction_always(declare,init_c,trans,Q,2),"invariante")
 
 
 class testTermina(unittest.TestCase): #testa d)
-    def test_pior_caso_existe(self):
-        self.assertEqual(caminho(4 * n, init), sat)
+    def test_decresce(self):
+        self.assertEqual(Kinduction_always(declare,init,trans,decresce_forall,1),"invariante")
 
-    def test_nao_ha_caminho_maior(self):
-        self.assertEqual(caminho(4 * n + 1, init), unsat)
+    def test_v_zero(self):
+        self.assertEqual(Kinduction_always(declare,init,trans,v_zero,1),"invariante")
 
 
 if __name__ == "__main__":
     unittest.main(argv=['x'], verbosity=2)
 
-"b): a prova é mais lenta que as outras porque o Z3 "
-"tem de raciocinar sobre multiplicações de bits, e isso mostra que a "
-"escolha de n influencia o custo da verificação."
+#"b): a prova é mais lenta que as outras porque o Z3 "
+#"tem de raciocinar sobre multiplicações de bits, e isso mostra que a "
+#"escolha de n influencia o custo da verificação."
