@@ -4,6 +4,7 @@ from TP3 import (declare, init, trans, erro, caminho, P, init_c, Q,
                   induction_always, Kinduction_always, decresce_forall, v_zero)
 
 
+#testes gerados com ajuda de LLM
 
 class TestModelo(unittest.TestCase): #testa a)
     def test_3_vezes_2(self):

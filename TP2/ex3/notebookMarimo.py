@@ -22,7 +22,7 @@ def _():
     )
     import unittest 
     n=8 #parametro
-    return (mo,)
+    return And, BitVec, LShR, Not, Or, Solver, UGE, ULT, ZeroExt, mo, n, sat
 
 
 @app.cell
@@ -85,7 +85,23 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(
+    And,
+    BitVec,
+    BitVecVal,
+    ForAll,
+    If,
+    Implies,
+    LShR,
+    Not,
+    Or,
+    Solver,
+    UGE,
+    ULT,
+    ZeroExt,
+    n,
+    sat,
+):
 
     def declare(i): #declara estado s, declaro(0) da atual e o 1 o seguinte
         s={}
@@ -458,17 +474,20 @@ def _(mo):
     (`test_mult.py`):
 
     ```
-    
+
     --powershell
-    
+
     python -m unittest test_mult.py
 
     --ubuntu e mac
 
 
     python3 -m unittest test_mult.py
-    
+
     ```
+
+    #Uso de LLM
+    link:  https://chatgpt.com/share/6aea35f2-da84-83ed-9e06-8666f05f5166
     """)
     return
 
