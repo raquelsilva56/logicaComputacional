@@ -1,6 +1,6 @@
 import unittest
 from z3 import And, sat, unsat
-from exercicio3 import (declare, init, trans, erro, caminho, P, init_c, Q,
+from TP3 import (declare, init, trans, erro, caminho, P, init_c, Q,
                   induction_always, Kinduction_always, decresce_forall, v_zero)
 
 
