@@ -58,11 +58,6 @@ def _(mo, passos_slider, transicao_multipla):
     return
 
 
-@app.cell
-def _():
-    return
-
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -127,7 +122,16 @@ def _(N, z3):
             ]
         )
 
-    return (estado_inicial,)
+    def estados_iguais(e0, e1):
+        return z3.And(
+            [
+                e0[(r, c)] == e1[(r, c)]
+                for r in range(1, N + 1)
+                for c in range(1, N + 1)
+            ]
+        )
+
+    return estado_erro, estado_inicial, estados_iguais
 
 
 @app.cell(hide_code=True)
@@ -149,14 +153,20 @@ def _(z3):
             if dr != 0 or dc != 0  # nao coletar a si mesma
         ]
 
-        # nao há conversao automatica Bool -> Int
-        vizinhos_vivos = z3.Sum(z3.If(v, 1, 0) for v in vizinhanca)
-
+        # assistência de LLM (https://share.gemini.google/pGKKl1QqwsYj): uso de PbEq
         # nasce ou sobrevive se tiver 3 vizinhos; sobrevive se tiver dois vizinhos
         return z3.Or(
-            vizinhos_vivos == 3, z3.And(e[(r, c)], vizinhos_vivos == 2)
+            z3.PbEq([(v, 1) for v in vizinhanca], 3),
+            z3.And(e[(r, c)], z3.PbEq([(v, 1) for v in vizinhanca], 2)),
         )
 
+        # código original
+        ## nao há conversao automatica Bool -> Int
+        # vizinhos_vivos = z3.Sum(z3.If(v, 1, 0) for v in vizinhanca)
+
+        # return z3.Or(
+        #    vizinhos_vivos == 3, z3.And(e[(r, c)], vizinhos_vivos == 2)
+        # )
     return (b3_s23,)
 
 
@@ -207,15 +217,7 @@ def _(N, b3_s23, z3):
 
 
 @app.cell
-def _(
-    N,
-    criar_estado,
-    estado_inicial,
-    passos_slider,
-    transicao,
-    transicao_multipla,
-    z3,
-):
+def _(N, z3):
     def desenha_estado(e, m=None):
         linhas = []
         for r in range(N + 2):
@@ -231,25 +233,120 @@ def _(
             linhas.append(" ".join(linha))
         return "\n".join(linhas)
 
-    K_max = passos_slider.stop
-    s_sim = z3.Solver()
-    estados = [criar_estado(t) for t in range(K_max + 1)]
+    #
+    # K_max = passos_slider.stop
+    # s_sim = z3.Solver()
+    # estados = [criar_estado(t) for t in range(K_max + 1)]
+    #
+    # s_sim.add(estado_inicial(estados[0]))
+    # for t in range(K_max):
+    #     s_sim.add(
+    #         transicao(
+    #             estados[t], estados[t + 1], multipla=transicao_multipla.value
+    #         )
+    #     )
+    #
+    # if s_sim.check() == z3.sat:
+    #     modelo = s_sim.model()
+    #     t_atual = passos_slider.value
+    #     print(desenha_estado(estados[t_atual], modelo))
+    #
+    # else:
+    #     print("error")
+    return (desenha_estado,)
 
-    s_sim.add(estado_inicial(estados[0]))
-    for t in range(K_max):
-        s_sim.add(
-            transicao(
-                estados[t], estados[t + 1], multipla=transicao_multipla.value
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Propriedades
+    Seguimos agora com a verificação formal a partir de provas ou contra-exemplos das propriedades explicitadas no enunciado.
+
+    ### 1: Nunca se alcança o estado de erro
+    Podemos interpretar essa propriedade em lógica temporal por $G\,\neg\text{(estado\_erro)}$.
+
+    - no passo $k$, verificamos se `estado_erro(estados[k])` é satisfazível. Se for, existe um caminho válido $e_0 \to \dots \to e_k$ onde todas as células normais estão mortas em $e_k$, i.e., a propriedade é falsa e temos um contra-exemplo.
+
+    - se `estado_erro(estados[k])` for insatisfazível, então testamos se os estados no traço até $k$ são todos dois-a-dois distintos, i.e., $\bigwedge_{0 \le i < j \le k} \neg\text{estados\_iguais}(e_i, e_j)$. Se esta restrição for insatisfazível, então sabemos que para o caso de transições múltiplas, numa execução de comprimento $k$ um estado anterior é obrigatoriamente repetido (formando um loop). Mas como já verificamos que nenhum dos estados anteriores até $k-1$ atinge o estado de erro, fica demonstrado que o estado de erro é inalcançável para qualquer $t \ge 0$, provando a propriedade.
+
+    Se nenhum dos dois casos se verificar, então aumentamos a profundidade de busca.
+    """)
+    return
+
+
+@app.cell
+def _(
+    criar_estado,
+    estado_erro,
+    estado_inicial,
+    estados_iguais,
+    mo,
+    transicao,
+    z3,
+):
+    def p1(multipla, profundidade):
+        P = lambda e: z3.Not(estado_erro(e))
+
+        s = z3.Solver()
+        estados = [criar_estado(0)]
+        s.add(estado_inicial(estados[0]))
+
+        for k in range(profundidade + 1):
+            if k > 0:
+                estados.append(criar_estado(k))
+                s.add(transicao(estados[-2], estados[-1], multipla=multipla))
+
+            # base (bmc até k): verifica se ~P(e_k) é sat
+            if s.check(z3.Not(P(estados[k]))) == z3.sat:
+                return "refutada", estados, s.model()
+
+            # testar se todos estados são distintos
+            if k > 0:
+                distintos = [
+                    z3.Not(estados_iguais(estados[i], estados[j]))
+                    for i in range(k + 1)
+                    for j in range(i + 1, k + 1)
+                ]
+                if s.check(*distintos) == z3.unsat:
+                    s.check()
+                    return "provada", estados, s.model()
+
+        return "inconclusiva", estados, None
+
+    profundidade_maxima = mo.ui.slider(
+        start=1, stop=400, value=200, label="Profundidade máxima"
+    )
+    profundidade_maxima
+    return p1, profundidade_maxima
+
+
+@app.cell
+def _(desenha_estado, mo, p1, profundidade_maxima, transicao_multipla):
+    res_p1, estados_p1, mod_p1 = p1(
+        transicao_multipla.value, profundidade_maxima.value
+    )
+    mo.md(
+        f"Resultado: {res_p1} (em $t = {len(estados_p1) - 1}$)\n\n"
+        + (
+            "```\n"
+            + "\n\n".join(
+                f"t = {t}:\n{desenha_estado(e, mod_p1)}"
+                for t, e in enumerate(estados_p1)
             )
+            + "\n```"
+            if mod_p1 is not None
+            else ""
         )
+    )
+    return
 
-    if s_sim.check() == z3.sat:
-        modelo = s_sim.model()
-        t_atual = passos_slider.value
-        print(desenha_estado(estados[t_atual], modelo))
 
-    else:
-        print("error")
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### 2: Nenhuma célula normal está permanentemente morta ou permanentemente viva
+    Podemos interpretar em lógica temporal por
+    """)
     return
 
 
