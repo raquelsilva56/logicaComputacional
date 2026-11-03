@@ -238,6 +238,3 @@ class testTermina(unittest.TestCase): #testa d)
 if __name__ == "__main__":
     unittest.main(argv=['x'], verbosity=2)
 
-#"b): a prova é mais lenta que as outras porque o Z3 "
-#"tem de raciocinar sobre multiplicações de bits, e isso mostra que a "
-#"escolha de n influencia o custo da verificação."

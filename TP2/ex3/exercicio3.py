@@ -1,4 +1,4 @@
-import marimo
+import marimo 
 
 app = marimo.App()
 
@@ -10,6 +10,7 @@ with app.setup:
     n = 8 #tamanho dos bitvecs. Parametro
 
 
+    
 @app.function
 def declare(i): #declara estado s, declaro(0) da atual e o 1 o seguinte
     s={}
@@ -230,49 +231,6 @@ def decresce_forall(s): #condicao 2 da ficha com o "para todo"
 def v_zero(s):
     return Implies(V(s)==0,terminal(s))
 
-
-@app.class_definition
-class TestModelo(unittest.TestCase): #testa a)
-    def test_3_vezes_2(self):
-        ini=lambda s: And(init(s), s['a']==3, s['b']==2)
-        self.assertEqual(caminho(6,ini,lambda s: And(s['pc']==5, s['z']==6)), sat) #3*2=6
-
-    def test_3_vezes_2_resultado_errado(self):
-        ini = lambda s: And(init(s), s['a'] == 3, s['b'] == 2)
-        self.assertEqual(caminho(6, ini, lambda s: And(s['pc'] == 5, s['z'] != 6)), unsat)
-
-    def test_overflow(self):
-        ini = lambda s: And(init(s), s['a'] == 200, s['b'] == 2)
-        self.assertEqual(caminho(3, ini, erro), sat)
-
-
-@app.class_definition
-class TestInvariante(unittest.TestCase): #testa b)
-    #a prova do k2 é mais lenta que as outras porque o Z3 tem de raciocinar
-    #sobre multiplicações de bits, e isso mostra que a escolha de n influencia o custo da verificação.
-    def test_k1_nao_basta(self):
-        self.assertEqual(induction_always(declare, init,trans,P),"Passo Indutivo falha")
-
-    def test_k2_prova(self):
-        self.assertEqual(Kinduction_always(declare,init,trans,P,2),"invariante")
-
-
-@app.class_definition
-class TestSeguranca(unittest.TestCase): #testa c)
-    def test_k1_nao_basta(self):
-        self.assertEqual(Kinduction_always(declare,init_c,trans,Q,1),"Passo Indutivo falha")
-
-    def test_k2_prova(self):
-        self.assertEqual(Kinduction_always(declare,init_c,trans,Q,2),"invariante")
-
-
-@app.class_definition
-class testTermina(unittest.TestCase): #testa d)
-    def test_decresce(self):
-        self.assertEqual(Kinduction_always(declare,init,trans,decresce_forall,1),"invariante")
-
-    def test_v_zero(self):
-        self.assertEqual(Kinduction_always(declare,init,trans,v_zero,1),"invariante")
 
 
 if __name__ == "__main__":
