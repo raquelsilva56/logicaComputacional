@@ -313,17 +313,20 @@ def _(
 
         return "inconclusiva", estados, None
 
-    profundidade_maxima = mo.ui.slider(
-        start=1, stop=400, value=200, label="Profundidade máxima"
+    profundidade_maxima_p1 = mo.ui.slider(
+        start=1,
+        stop=400,
+        value=200,
+        label="Profundidade máxima para a propriedade 1",
     )
-    profundidade_maxima
-    return p1, profundidade_maxima
+    profundidade_maxima_p1
+    return p1, profundidade_maxima_p1
 
 
 @app.cell
-def _(desenha_estado, mo, p1, profundidade_maxima, transicao_multipla):
+def _(desenha_estado, mo, p1, profundidade_maxima_p1, transicao_multipla):
     res_p1, estados_p1, mod_p1 = p1(
-        transicao_multipla.value, profundidade_maxima.value
+        transicao_multipla.value, profundidade_maxima_p1.value
     )
     mo.md(
         f"Resultado: {res_p1} (em $t = {len(estados_p1) - 1}$)\n\n"
@@ -345,8 +348,89 @@ def _(desenha_estado, mo, p1, profundidade_maxima, transicao_multipla):
 def _(mo):
     mo.md(r"""
     ### 2: Nenhuma célula normal está permanentemente morta ou permanentemente viva
-    Podemos interpretar em lógica temporal por
+
+    Podemos interpretar em lógica temporal por $\neg(G\,\neg c \lor G\,c)$ para cada célula normal $c$.
+
+    - no passo $k1$, procuramos um ciclo (um caminho $e_0 \to \dots \to e_k$ que fecha um ciclo $\bigvee_{0 \le m \lt k} \text{estados\_iguais}(e_m, e_k)$) onde alguma célula normal manteve o seu valor inicial em todos os passos, i.e., $\bigvee_c \bigwedge^{k} (e_0[c] = e_t[c])$. Se a for satisfazível, temos um exemplo de uma execução que se repete na qual a célula permanece constante, i.e., a propriedade é falsa e temos um contra-exemplo.
+    - se for insatisfazível, testamos se os estados no traço até $k$ são todos dois-a-dois distintos, i.e., $\bigwedge_{0 \le i < j \le k} \neg\text{estados\_iguais}(e_i, e_j)$. se a restrição for insatisfazível, todas as execuções de comprimento $k$ já repetiram obrigatoriamente um estado anterior sem que nenhum ciclo mantivesse uma célula permanente, ficando a propriedade provada.
+
+    Se nenhum dos dois casos se verificar novamennte aumentamos a profundidade da busca
     """)
+    return
+
+
+@app.cell
+def _(N, criar_estado, estado_inicial, estados_iguais, mo, transicao, z3):
+    def p2(multipla, profundidade):
+        s = z3.Solver()
+        estados = [criar_estado(0)]
+        s.add(estado_inicial(estados[0]))
+
+        for k in range(1, profundidade + 1):
+            estados.append(criar_estado(k))
+            s.add(transicao(estados[-2], estados[-1], multipla=multipla))
+
+            # tentamos detectar um ciclo para o contra-exemplo
+            fecho_ciclo = z3.Or(
+                [estados_iguais(estados[k], estados[m]) for m in range(k)]
+            )
+
+            # verificamos se existe alguma célula que permaneceu constante ao longo de todos os estados do ciclo
+            celula_permanente = z3.Or(
+                [
+                    z3.And(
+                        [
+                            estados[t][(r, c)] == estados[0][(r, c)]
+                            for t in range(1, k + 1)
+                        ]
+                    )
+                    for r in range(1, N + 1)
+                    for c in range(1, N + 1)
+                ]
+            )
+
+            if s.check(fecho_ciclo, celula_permanente) == z3.sat:
+                return "refutada", estados, s.model()
+
+            distintos = [
+                z3.Not(estados_iguais(estados[i], estados[j]))
+                for i in range(k + 1)
+                for j in range(i + 1, k + 1)
+            ]
+            if s.check(*distintos) == z3.unsat:
+                s.check()
+                return "provada", estados, s.model()
+
+        return "inconclusiva", estados, None
+
+    profundidade_maxima_p2 = mo.ui.slider(
+        start=1,
+        stop=400,
+        value=200,
+        label="Profundidade máxima para a propriedade 2",
+    )
+    profundidade_maxima_p2
+    return p2, profundidade_maxima_p2
+
+
+@app.cell
+def _(desenha_estado, mo, p2, profundidade_maxima_p2, transicao_multipla):
+    res_p2, estados_p2, mod_p2 = p2(
+        transicao_multipla.value, profundidade_maxima_p2.value
+    )
+    mo.md(
+        f"Resultado: {res_p2} (em $t = {len(estados_p2) - 1}$)\n\n"
+        + (
+            "```\n"
+            + "\n\n".join(
+                f"t = {t}:\n{desenha_estado(e, mod_p2)}"
+                for t, e in enumerate(estados_p2)
+            )
+            + "\n```"
+            if mod_p2 is not None
+            else ""
+        )
+    )
     return
 
 
