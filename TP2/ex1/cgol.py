@@ -4,15 +4,6 @@ __generated_with = "0.25.1"
 app = marimo.App(width="medium")
 
 
-@app.cell
-def _():
-    import marimo as mo
-    import random
-    import z3
-
-    return mo, random, z3
-
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -42,20 +33,42 @@ def _(mo):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    # Resolução
+    """)
+    return
+
+
+@app.cell
+def _():
+    import marimo as mo
+    import random
+    import z3
+
+    return mo, random, z3
+
+
 @app.cell
 def _(mo):
-    N = 20
-    transicao_multipla = mo.ui.switch(label="Transição múltipla")
-    passos_slider = mo.ui.slider(
-        start=0, stop=8, value=0, label="Passo t para visualizar"
+    N_slide = mo.ui.slider(
+        start=15, stop=100, value=20, label="Dimensão da grelha"
     )
-    return N, passos_slider, transicao_multipla
+    transicao_multipla = mo.ui.switch(label="Transição múltipla")
+    return N_slide, transicao_multipla
 
 
 @app.cell
-def _(mo, passos_slider, transicao_multipla):
-    mo.hstack([transicao_multipla, passos_slider])
+def _(N_slide, mo, transicao_multipla):
+    mo.vstack([N_slide, transicao_multipla])
     return
+
+
+@app.cell
+def _(N_slide):
+    N = N_slide.value
+    return (N,)
 
 
 @app.cell(hide_code=True)
@@ -98,6 +111,8 @@ def _(mo):
     mo.md(r"""
     ### Estado inicial e estado de erro
     Conforme especificado no enunciado, o estado inicial $e_0$ contém todas as células normais mortas, com exceção daquelas com ambos os índices $\leq 3$. O estado de erro é definido como o estado em que todas as célulsa normais estão mortas.
+
+    Definimos também uma função `estados_iguais` que verifica se dois estados possuem exatamente os mesmos valores para cada célula.
     """)
     return
 
@@ -324,22 +339,37 @@ def _(
 
 
 @app.cell
-def _(desenha_estado, mo, p1, profundidade_maxima_p1, transicao_multipla):
+def _(mo, p1, profundidade_maxima_p1, transicao_multipla):
     res_p1, estados_p1, mod_p1 = p1(
         transicao_multipla.value, profundidade_maxima_p1.value
     )
-    mo.md(
-        f"Resultado: {res_p1} (em $t = {len(estados_p1) - 1}$)\n\n"
-        + (
-            "```\n"
-            + "\n\n".join(
-                f"t = {t}:\n{desenha_estado(e, mod_p1)}"
-                for t, e in enumerate(estados_p1)
-            )
-            + "\n```"
-            if mod_p1 is not None
-            else ""
-        )
+
+    passo_p1 = mo.ui.slider(
+        start=0,
+        stop=len(estados_p1) - 1,
+        value=len(estados_p1) - 1,
+        step=1,
+        label="t",
+    )
+    return estados_p1, mod_p1, passo_p1, res_p1
+
+
+@app.cell
+def _(desenha_estado, estados_p1, mo, mod_p1, passo_p1, res_p1):
+    mo.vstack(
+        [
+            mo.md(f"Resultado: {res_p1} (em $t = {len(estados_p1) - 1}$)"),
+            *(
+                [
+                    passo_p1,
+                    mo.md(
+                        f"```\nt = {passo_p1.value}:\n{desenha_estado(estados_p1[passo_p1.value], mod_p1)}\n```"
+                    ),
+                ]
+                if mod_p1 is not None
+                else []
+            ),
+        ]
     )
     return
 
@@ -351,10 +381,10 @@ def _(mo):
 
     Podemos interpretar em lógica temporal por $\neg(G\,\neg c \lor G\,c)$ para cada célula normal $c$.
 
-    - no passo $k1$, procuramos um ciclo (um caminho $e_0 \to \dots \to e_k$ que fecha um ciclo $\bigvee_{0 \le m \lt k} \text{estados\_iguais}(e_m, e_k)$) onde alguma célula normal manteve o seu valor inicial em todos os passos, i.e., $\bigvee_c \bigwedge^{k} (e_0[c] = e_t[c])$. Se a for satisfazível, temos um exemplo de uma execução que se repete na qual a célula permanece constante, i.e., a propriedade é falsa e temos um contra-exemplo.
+    - no passo $k$, procuramos um um caminho $e_0 \to \dots \to e_k$ que fecha um ciclo $\bigvee_{0 \le m \lt k} \text{estados\_iguais}(e_m, e_k)$ onde alguma célula normal manteve o seu valor inicial em todos os passos, i.e., $\bigvee_c \bigwedge^{k} (e_0[c] = e_t[c])$. Se for satisfazível, temos um exemplo de uma execução que se repete na qual a célula permanece constante, i.e., a propriedade é falsa e temos um contra-exemplo.
     - se for insatisfazível, testamos se os estados no traço até $k$ são todos dois-a-dois distintos, i.e., $\bigwedge_{0 \le i < j \le k} \neg\text{estados\_iguais}(e_i, e_j)$. se a restrição for insatisfazível, todas as execuções de comprimento $k$ já repetiram obrigatoriamente um estado anterior sem que nenhum ciclo mantivesse uma célula permanente, ficando a propriedade provada.
 
-    Se nenhum dos dois casos se verificar novamennte aumentamos a profundidade da busca
+    Se nenhum dos dois casos se verificar novamente aumentmaos a profundidade da busca
     """)
     return
 
@@ -414,22 +444,37 @@ def _(N, criar_estado, estado_inicial, estados_iguais, mo, transicao, z3):
 
 
 @app.cell
-def _(desenha_estado, mo, p2, profundidade_maxima_p2, transicao_multipla):
+def _(mo, p2, profundidade_maxima_p2, transicao_multipla):
     res_p2, estados_p2, mod_p2 = p2(
         transicao_multipla.value, profundidade_maxima_p2.value
     )
-    mo.md(
-        f"Resultado: {res_p2} (em $t = {len(estados_p2) - 1}$)\n\n"
-        + (
-            "```\n"
-            + "\n\n".join(
-                f"t = {t}:\n{desenha_estado(e, mod_p2)}"
-                for t, e in enumerate(estados_p2)
-            )
-            + "\n```"
-            if mod_p2 is not None
-            else ""
-        )
+
+    passo_p2 = mo.ui.slider(
+        start=0,
+        stop=len(estados_p2) - 1,
+        value=len(estados_p2) - 1,
+        step=1,
+        label="t",
+    )
+    return estados_p2, mod_p2, passo_p2
+
+
+@app.cell
+def _(desenha_estado, estados_p2, mo, mod_p2, passo_p2, res_p1):
+    mo.vstack(
+        [
+            mo.md(f"Resultado: {res_p1} (em $t = {len(estados_p2) - 1}$)"),
+            *(
+                [
+                    passo_p2,
+                    mo.md(
+                        f"```\nt = {passo_p2.value}:\n{desenha_estado(estados_p2[passo_p2.value], mod_p2)}\n```"
+                    ),
+                ]
+                if mod_p2 is not None
+                else []
+            ),
+        ]
     )
     return
 
