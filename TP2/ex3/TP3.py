@@ -22,10 +22,11 @@ def init(s): #estado inicial, a e b livres ainda
 #funcao de estado de transicao
 #cada transicao e uma funcao (s,t) s=atual, t=seguinte.
 def keep(s, t, nomes):
-    return And([t[v] == s[v] for v in nomes])
+    return And([t[v] == s[v] for v in nomes]) #nomes sao as que nao sofrem alteracoes~
+#cria conj log p cada var v, o seu valor no prox == ao q tinha no atual
 
 #skip - left(y != 0 and even(y)), skip nao altera nadaa, so decide para onde ir
-def skip_left(s,t):
+def skip_left(s,t): #avalia se y even
     return And(s['pc'] == 1, s['y'] !=0, (s['y'] & 1)==0,
     t['pc'] ==2,
     keep(s,t, ['a','b','x','y','z']))
@@ -55,7 +56,7 @@ def left_error(s,t):
 
 #os padroes do right, muda a detecao do overflow
 
-def right_skip(s, t):
+def right_skip(s, t): #faz a execucao
     return And(s['pc'] == 3,
                UGE(s['z'] + s['x'], s['z']),   #sem overflow na soma
                t['pc'] == 1,
@@ -90,13 +91,15 @@ def ramos(s,t):
 def terminal(s): 
     return Or(s['pc'] == 4, s['pc'] == 5) #estado de erro ou stop
 
-def laco(s,t):
+def laco(s,t): #loop ciclo continuo q repete transicoes e calcula
     return And(terminal(s), keep(s,t,['pc','a','b','x','y','z']))
-def trans(s,t):
+
+def trans(s,t): #valida a transicao o par de estados é valido se corresponder a um dos caminhos de ramos
+
     return Or(ramos(s,t),laco(s,t))
 
 
-def induction_always(declare, init,trans,inv):
+def induction_always(declare, init,trans,inv): #CE onde o estado é valido mas a inv nao
     #da ficha8
     s,t=declare(0), declare(1)
     sol=Solver()
@@ -111,7 +114,7 @@ def induction_always(declare, init,trans,inv):
 
 
 
-def Kinduction_always(declare, init,trans, inv,k):
+def Kinduction_always(declare, init,trans, inv,k): #assume qfoi valida e tenta provar o resto
     st=[declare(i) for i in range(k+1)]
     sol=Solver()
     sol.add(init(st[0]))
@@ -129,7 +132,7 @@ def Kinduction_always(declare, init,trans, inv,k):
     return "invariante"
 
 
-#parte b) k-inducao, provar que P(s) := x*y + z == a*b vale em todos os estados alcancaveis.
+#parte b k-inducao, provar que P(s) := x*y + z == a*b vale em todos os estados alcancaveis.
 # nao da para percorrer tudo(infinitos) logo a inducao usa duas verificacoes: Para k=1:
 #Base: estado inicial cumpre P. Inducao: se um estado cumpre P e vai para outro, esse tbm cumpre P.
 #Em ambas, decidi pedir um contra-exemplo ao z3, unsat se nao houver, logo esta provado. 
@@ -165,6 +168,9 @@ def caminho(K, inicio, final=None):
     if final:
         sol.add(final(st[K]))
     return sol.check() 
+#pode falhar pq um k pequeno da falso alarme no z3 ent aumenta se o k~
+
+
 
 #propriedade de terminação(animação): F(G terminal)
 #a partir de qualquer estado inicial (a,b,quaisquer), o sistema chega a um estado final
@@ -175,11 +181,13 @@ def caminho(K, inicio, final=None):
 #3) V=0 -> terminal -> v_zero
 
 
-def V(s): #variante em 2n bits
+def V(s): #variante em 2n bits, calcula valor para s e mede quanot falta
     y=W(s['y'])
     w=If(s['pc']==0, BitVecVal(3,2*n),
          If(s['pc']==1, BitVecVal(2,2*n), BitVecVal(1,2*n)))
-    return If(terminal(s), BitVecVal(0,2*n), 4*y+w)
+    return If(terminal(s), BitVecVal(0,2*n), 4*y+w) # 4 da espaco grande live para cada valor de y, w é para ter a 
+#certeza q desce, pois onde y n varia, entao ele n decresce em TODA a transicao
+
 
 def decresce(s,t): #V' <V ou V'=0 
     return Or(ULT(V(t),V(s)),V(t)==0)
