@@ -53,15 +53,16 @@ def _():
 @app.cell
 def _(mo):
     N_slide = mo.ui.slider(
-        start=15, stop=100, value=20, label="Dimensão da grelha"
+        start=17, stop=100, value=20, label="Dimensão da grelha"
     )
     transicao_multipla = mo.ui.switch(label="Transição múltipla")
-    return N_slide, transicao_multipla
+    seed = mo.ui.number(value=2112026, label="Valor da seed aleatória")
+    return N_slide, seed, transicao_multipla
 
 
 @app.cell
-def _(N_slide, mo, transicao_multipla):
-    mo.vstack([N_slide, transicao_multipla])
+def _(N_slide, mo, seed, transicao_multipla):
+    mo.vstack([seed, N_slide, transicao_multipla])
     return
 
 
@@ -82,9 +83,9 @@ def _(mo):
 
 
 @app.cell
-def _(N, random, z3):
-    def criar_estado(t, seed=2112026):
-        rng = random.Random(seed)
+def _(N, random, seed, z3):
+    def criar_estado(t):
+        rng = random.Random(seed.value)
         e = {}
         for r in range(N + 2):
             for c in range(N + 2):
@@ -248,26 +249,6 @@ def _(N, z3):
             linhas.append(" ".join(linha))
         return "\n".join(linhas)
 
-    #
-    # K_max = passos_slider.stop
-    # s_sim = z3.Solver()
-    # estados = [criar_estado(t) for t in range(K_max + 1)]
-    #
-    # s_sim.add(estado_inicial(estados[0]))
-    # for t in range(K_max):
-    #     s_sim.add(
-    #         transicao(
-    #             estados[t], estados[t + 1], multipla=transicao_multipla.value
-    #         )
-    #     )
-    #
-    # if s_sim.check() == z3.sat:
-    #     modelo = s_sim.model()
-    #     t_atual = passos_slider.value
-    #     print(desenha_estado(estados[t_atual], modelo))
-    #
-    # else:
-    #     print("error")
     return (desenha_estado,)
 
 
@@ -456,14 +437,14 @@ def _(mo, p2, profundidade_maxima_p2, transicao_multipla):
         step=1,
         label="t",
     )
-    return estados_p2, mod_p2, passo_p2
+    return estados_p2, mod_p2, passo_p2, res_p2
 
 
 @app.cell
-def _(desenha_estado, estados_p2, mo, mod_p2, passo_p2, res_p1):
+def _(desenha_estado, estados_p2, mo, mod_p2, passo_p2, res_p2):
     mo.vstack(
         [
-            mo.md(f"Resultado: {res_p1} (em $t = {len(estados_p2) - 1}$)"),
+            mo.md(f"Resultado: {res_p2} (em $t = {len(estados_p2) - 1}$)"),
             *(
                 [
                     passo_p2,
